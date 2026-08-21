@@ -1,0 +1,46 @@
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { groupSourcesByFamily, type SourceFamily } from "@/lib/sourceGovernance";
+import { trpc } from "@/lib/trpc";
+import { CheckCircle2, Database, ExternalLink, Loader2, LockKeyhole, Save, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+
+type SourceDraft = { status: "approved" | "pending" | "disabled"; termsUrl: string; adapterKind: string; rateLimit: string; accessNotes: string; enabled: boolean };
+
+const familyCopy: Record<SourceFamily, { title: string; description: string }> = {
+  Government: { title: "Government", description: "Official public-service and government vacancy channels, handled as structured public records." },
+  "Job platforms": { title: "Job platforms", description: "Approved public APIs and feeds with source attribution, application links, and respectful refresh limits." },
+  "Company careers": { title: "Company careers", description: "Direct employer and public ATS feeds. Only documented, permitted feeds may move from review to active use." },
+};
+
+function statusClass(status: SourceDraft["status"]) {
+  if (status === "approved") return "border-emerald-300/25 bg-emerald-400/10 text-emerald-200";
+  if (status === "pending") return "border-amber-300/25 bg-amber-300/10 text-amber-100";
+  return "border-red-300/25 bg-red-400/10 text-red-200";
+}
+
+export default function Sources() {
+  const { user } = useAuth();
+  const utils = trpc.useUtils();
+  const sources = trpc.admin.listSources.useQuery(undefined, { enabled: user?.role === "admin" });
+  const dailyRefresh = trpc.admin.dailyRefreshStatus.useQuery(undefined, { enabled: user?.role === "admin" });
+  const update = trpc.admin.updateSource.useMutation({ onSuccess: () => { utils.admin.listSources.invalidate(); utils.dashboard.get.invalidate(); } });
+  const [drafts, setDrafts] = useState<Record<string, SourceDraft>>({});
+
+  useEffect(() => {
+    if (!sources.data) return;
+    setDrafts(Object.fromEntries(sources.data.map(source => [source.source, { status: source.status, termsUrl: source.termsUrl, adapterKind: source.adapterKind, rateLimit: source.rateLimit, accessNotes: source.accessNotes, enabled: source.enabled === 1 }])));
+  }, [sources.data]);
+
+  if (user?.role !== "admin") return <div className="jo-page mx-auto grid min-h-[65vh] max-w-xl place-items-center px-6 text-center"><div><div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#d7b66d]/10"><LockKeyhole className="h-5 w-5 jo-gold-text" /></div><h1 className="mt-4 text-xl font-semibold text-[#f3eadc]">Administrator area</h1><p className="mt-2 text-sm leading-6 text-[#a9a093]">Only project administrators can review and manage public vacancy sources.</p></div></div>;
+  if (sources.isLoading) return <div className="jo-page grid min-h-[70vh] place-items-center"><Loader2 className="h-6 w-6 animate-spin jo-gold-text" /></div>;
+
+  const groups = groupSourcesByFamily(sources.data ?? []);
+  return <div className="jo-page mx-auto max-w-6xl space-y-6 px-1 py-2 sm:px-3 lg:px-6"><section className="rounded-[28px] border border-[#d7b66d]/20 bg-[#0d0d0e] px-6 py-7 shadow-xl shadow-black/30 sm:px-8"><div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] jo-gold-text"><Database className="h-4 w-4" /> Source integrity</div><h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-[#f5eee3]">Source management</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-[#c9c0b3]">The source engine stays behind the scenes. Every enabled source needs a documented access basis, terms link, rate limit, attribution path, and clear application destination.</p></section><section className="grid gap-4 md:grid-cols-3"><Card className="jo-card"><CardContent className="p-5"><ShieldCheck className="h-5 w-5 jo-gold-text" /><p className="mt-3 text-sm font-semibold text-[#ede3d4]">Approved access</p><p className="mt-1 text-xs leading-5 text-[#a9a093]">Sources are enabled only when their access method is documented.</p></CardContent></Card><Card className="jo-card"><CardContent className="p-5"><CheckCircle2 className="h-5 w-5 jo-teal-text" /><p className="mt-3 text-sm font-semibold text-[#ede3d4]">Original destinations</p><p className="mt-1 text-xs leading-5 text-[#a9a093]">Applicants are sent to the most authoritative original posting.</p></CardContent></Card><Card className="jo-card"><CardContent className="p-5"><Database className="h-5 w-5 jo-gold-text" /><p className="mt-3 text-sm font-semibold text-[#ede3d4]">Normalise, then match</p><p className="mt-1 text-xs leading-5 text-[#a9a093]">Different source formats are governed before they influence ranking.</p></CardContent></Card></section><div className="space-y-6">{groups.map(group => <section key={group.family}><div className="mb-3"><p className="text-xs font-semibold uppercase tracking-[.14em] jo-gold-text">{familyCopy[group.family].title}</p><p className="mt-1 text-sm text-[#a9a093]">{familyCopy[group.family].description}</p></div><div className="grid gap-4 lg:grid-cols-2">{group.sources.map(source => { const draft = drafts[source.source]; if (!draft) return null; const scheduled = source.source === "jobicy" ? dailyRefresh.data : null; const nextRun = scheduled?.nextExecutionAt ?? source.nextScheduledAt; return <Card key={source.id} className="jo-card"><CardContent className="p-6"><div className="flex flex-wrap items-start justify-between gap-4"><div><div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-semibold tracking-tight text-[#f2eadf]">{source.displayName}</h2><span className={`rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${statusClass(draft.status)}`}>{draft.status}</span></div><p className="mt-2 text-xs uppercase tracking-[.12em] text-[#998f80]">{source.adapterKind} · {source.lastRefreshAt ? `Refreshed ${new Date(source.lastRefreshAt).toLocaleString()}` : "Not refreshed yet"}</p></div><div className="flex items-center gap-3"><Label htmlFor={`${source.source}-enabled`} className="text-sm text-[#bcb1a2]">Enabled</Label><Switch id={`${source.source}-enabled`} checked={draft.enabled} onCheckedChange={value => setDrafts(current => ({ ...current, [source.source]: { ...draft, enabled: value } }))} /></div></div><div className="mt-6 grid gap-4"><div className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label>Status</Label><Select value={draft.status} onValueChange={value => setDrafts(current => ({ ...current, [source.source]: { ...draft, status: value as SourceDraft["status"] } }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="approved">Approved</SelectItem><SelectItem value="pending">Pending permission</SelectItem><SelectItem value="disabled">Disabled</SelectItem></SelectContent></Select></div><div className="space-y-2"><Label>Access method</Label><Input value={draft.adapterKind} onChange={event => setDrafts(current => ({ ...current, [source.source]: { ...draft, adapterKind: event.target.value } }))} /></div></div><div className="space-y-2"><Label>Terms / access basis</Label><div className="flex gap-2"><Input value={draft.termsUrl} onChange={event => setDrafts(current => ({ ...current, [source.source]: { ...draft, termsUrl: event.target.value } }))} /><a href={draft.termsUrl} target="_blank" rel="noreferrer" className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-[#d7b66d]/25 text-[#cdbb91] hover:text-[#f0d991]"><ExternalLink className="h-4 w-4" /></a></div></div><div className="grid gap-4 sm:grid-cols-[.7fr_1.3fr]"><div className="space-y-2"><Label>Rate limit</Label><Input value={draft.rateLimit} onChange={event => setDrafts(current => ({ ...current, [source.source]: { ...draft, rateLimit: event.target.value } }))} /></div><div className="space-y-2"><Label>Access notes</Label><Textarea rows={2} value={draft.accessNotes} onChange={event => setDrafts(current => ({ ...current, [source.source]: { ...draft, accessNotes: event.target.value } }))} /></div></div></div><div className="mt-5 flex items-center justify-between gap-4"><p className="text-xs text-[#a9a093]">{scheduled ? `Daily refresh active · ${scheduled.cronExpression} UTC${nextRun ? ` · Next run ${new Date(nextRun).toLocaleString()}` : ""}` : source.dailyTaskUid ? `Daily background refresh configured${nextRun ? ` · Next run ${new Date(nextRun).toLocaleString()}` : ""}.` : "No background refresh task configured."}</p><Button size="sm" onClick={() => update.mutate({ source: source.source, ...draft })} disabled={update.isPending}><Save className="mr-2 h-4 w-4" />Save source</Button></div>{update.isSuccess && <p className="mt-3 flex items-center gap-2 text-sm text-emerald-300"><CheckCircle2 className="h-4 w-4" />Source settings saved.</p>}</CardContent></Card>; })}</div></section>)}</div></div>;
+}

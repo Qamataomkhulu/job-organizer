@@ -1,0 +1,7 @@
+# Cybersecurity Shortlist Comparison Review
+
+The user-supplied LinkedIn examples show direct cybersecurity opportunities located in Johannesburg, Sandton, Gauteng, and South Africa remote. The visible titles include **L3 SOC Analyst**, **Security Specialist (Senior)**, **Security Analyst – Tier 2**, **SOC Analyst**, **SOC Engineer**, **Junior Security Operations Center Analyst**, **Information Security Specialist**, **IT Security Specialist (Firewall)**, **Cyber Security: Assurance**, **Senior Information Security Engineer – Application Security**, **Principle Cyber Security Engineer**, **Cyber Security Analyst**, and **Technical Cyber Security Consultant**.
+
+The earlier Job Organizer shortlist instead contained country-restricted US remote and unrelated titles, including Senior Technical Program Manager – Security, Staff Social Strategy & Operations Manager, Field Operations Manager / Associate, Software Engineer – Security Observability, Associate Product Operations Manager, and Generative Media Engineer. Some descriptions shared generic terms such as incident, response, intelligence, automation, data, and compliance, but they lacked the direct cybersecurity practitioner title evidence required for this candidate.
+
+The revised matching policy therefore requires a direct cybersecurity practitioner role for a cybersecurity profile and retains only opportunities in South Africa, explicitly worldwide-eligible remote positions, or roles with stated relocation or visa support. It does not claim that a job is eligible based on the word “remote” alone.

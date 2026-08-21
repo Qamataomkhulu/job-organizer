@@ -1,0 +1,1 @@
+ALTER TABLE `jobMatches` ADD `evidenceTagsJson` text;

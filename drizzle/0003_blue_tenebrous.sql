@@ -1,0 +1,1 @@
+ALTER TABLE `sourceConfigs` ADD `nextScheduledAt` timestamp;

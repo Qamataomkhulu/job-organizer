@@ -1,0 +1,18 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MarkdownDocument } from "@/components/MarkdownDocument";
+import { trpc } from "@/lib/trpc";
+import { Download, FileArchive, FileText, Loader2, Sparkles } from "lucide-react";
+
+export default function Outputs() {
+  const dashboard = trpc.dashboard.get.useQuery();
+  const createPackage = trpc.outputs.generate.useMutation({ onSuccess: ({ url }) => window.open(url, "_blank", "noopener,noreferrer") });
+  if (dashboard.isLoading) return <div className="jo-page grid min-h-[70vh] place-items-center"><Loader2 className="h-6 w-6 animate-spin jo-gold-text" /></div>;
+  const resume = dashboard.data?.latestResume;
+  if (!resume) return <EmptyOutputs />;
+  return <div className="jo-page mx-auto max-w-7xl space-y-6 px-1 py-2 sm:px-3 lg:px-6"><section className="flex flex-col justify-between gap-5 rounded-[28px] border border-[#d7b66d]/20 bg-[#0d0d0e] px-6 py-7 shadow-xl shadow-black/30 sm:flex-row sm:items-end sm:px-8"><div><div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] jo-teal-text"><Sparkles className="h-4 w-4" /> Evidence-led documents</div><h1 className="text-3xl font-semibold tracking-[-0.04em] text-[#f5eee3]">Your career outputs</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#c9c0b3]">A natural master CV and practical career guidance based on your documented employment timeline. Nothing here copies a job description or invents experience.</p></div><Button onClick={() => createPackage.mutate()} disabled={createPackage.isPending}><FileArchive className="mr-2 h-4 w-4" />{createPackage.isPending ? "Building package…" : "Download ZIP package"}</Button></section><Tabs defaultValue="cv"><TabsList className="border border-[#d7b66d]/20 bg-[#151313]"><TabsTrigger value="cv"><FileText className="mr-2 h-4 w-4" />Master CV</TabsTrigger><TabsTrigger value="guidance"><Sparkles className="mr-2 h-4 w-4" />Guidance</TabsTrigger></TabsList><TabsContent value="cv" className="mt-5"><Card className="jo-card"><CardContent className="p-6 sm:p-9"><MarkdownDocument content={resume.masterCv} /></CardContent></Card></TabsContent><TabsContent value="guidance" className="mt-5"><div className="grid gap-5 lg:grid-cols-2"><GuidanceCard title="Career-gap guidance" content={resume.careerGapGuidance} /><GuidanceCard title="Salary-positioning guidance" content={resume.salaryGuidance} /></div></TabsContent></Tabs>{createPackage.isError && <p className="text-sm text-red-300">{createPackage.error.message}</p>}</div>;
+}
+
+function GuidanceCard({ title, content }: { title: string; content: string }) { return <Card className="jo-card"><CardContent className="p-6"><h2 className="font-semibold tracking-tight text-[#f2eadf]">{title}</h2><div className="mt-4"><MarkdownDocument content={content} compact /></div></CardContent></Card>; }
+function EmptyOutputs() { return <div className="jo-page mx-auto grid min-h-[68vh] max-w-xl place-items-center px-6 text-center"><div><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#d7b66d]/10"><Download className="h-6 w-6 jo-gold-text" /></div><h1 className="mt-5 text-2xl font-semibold tracking-tight text-[#f2eadf]">Your documents will live here</h1><p className="mt-2 text-sm leading-6 text-[#aaa194]">After you upload a résumé, Job Organizer will generate a natural master CV, career-gap guidance, salary-positioning guidance, and a ZIP package containing the CV and linked Top 25 shortlist.</p></div></div>; }

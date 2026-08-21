@@ -1,0 +1,62 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1787129865910,
+      "tag": "0000_adorable_stone_men",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787130445313,
+      "tag": "0001_broken_whizzer",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787131048820,
+      "tag": "0002_sleepy_lady_ursula",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1787132852648,
+      "tag": "0003_blue_tenebrous",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1787134793074,
+      "tag": "0004_special_magneto",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1787283528114,
+      "tag": "0005_cheerful_speed",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1787292068265,
+      "tag": "0006_aberrant_vulture",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1787298693089,
+      "tag": "0007_lumpy_terror",
+      "breakpoints": true
+    }
+  ]
+}

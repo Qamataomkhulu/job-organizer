@@ -1,0 +1,76 @@
+# Project TODO
+
+- [x] Define approved public-job-source registry with source status, terms URL, rate limit, and adapter configuration.
+- [x] Create secure résumé-upload intake for PDF files with S3-backed metadata storage.
+- [x] Implement server-side AI résumé extraction for skills, experience, certifications, titles, and employment timeline.
+- [x] Implement evidence-led role-family matching with exactly Priority, Strong, and Selective fit tiers.
+- [x] Build public vacancy ingestion adapters that preserve original posting URLs and retain only approved-source records.
+- [x] Implement transparent job-fit scoring, ranking, deduplication, and a Top 25 shortlist.
+- [x] Generate a natural master CV that does not mirror a job description.
+- [x] Generate career-gap and salary-positioning guidance from the user’s stated employment timeline.
+- [x] Generate a downloadable ZIP package containing the master CV and linked ranked-job list.
+- [x] Build a polished authenticated dashboard with résumé history, current shortlist, and vacancy-refresh status.
+- [x] Add scheduled daily public-vacancy refresh with an idempotent authenticated callback.
+- [x] Add source-management and refresh controls for administrators.
+- [x] Add database migrations, server tests, and client validation/error states.
+- [x] Write GitHub setup, data-governance, and operating documentation.
+- [x] Verify responsive UI and application workflows with automated tests and visual review.
+- [x] Publish the site and activate the platform-managed daily Jobicy refresh from the administrator control.
+- [x] Verify the published daily Jobicy refresh task and record its next execution time.
+- [x] Prepare a portable source-code ZIP and self-hosting guide for deployment to a user-controlled domain.
+- [x] Verify the published app’s visitor access flow and confirm résumé data is isolated by authenticated user.
+- [x] Add a user-controlled privacy action that deletes résumé-derived database records, linked shortlist records, and stored-file references.
+- [x] Add privacy disclosure and validate that deletion cannot remove another user’s data.
+- [x] Diagnose and fix the restored privacy page tRPC error caused by an undefined value during a privacy query.
+- [x] Add regression coverage and validate authenticated access to the privacy page.
+- [x] Extract and incorporate the uploaded dashboard content into the restored Job Organizer experience.
+- [x] Apply a clean near-black, warm-gold, and restrained teal dashboard system inspired by the provided visual direction.
+- [x] Add dashboard regression coverage and verify the branded dashboard visually.
+- [x] Add prominent fully-remote and relocation-support tags to job cards when confirmed by source data.
+- [x] Replace generic match copy with structured evidence tags based on documented profile-to-job overlap.
+- [x] Strengthen ranking with role-title alignment alongside transferable function and skill evidence, then validate the new ordering.
+- [x] Show Priority and Strong direct role matches by default, with a transparent empty state instead of generic Selective filler.
+- [x] Seed the initial preferred job-title controls from latest résumé employment-history titles while retaining manual additions and removals.
+- [x] Build a role-family explorer that surfaces adjacent career paths grounded in documented titles, role families, and skills.
+- [x] Add scoped router regression coverage for title selection, saving, and local reranking; then revalidate the Career Direction controls.
+- [x] Compare current shortlist results with the documented cybersecurity roles and skills evidenced in the user’s résumé and supplied LinkedIn examples.
+- [x] Exclude unrelated role families from direct matching and prioritise direct South African cybersecurity roles plus genuinely eligible international cybersecurity roles.
+- [x] Add cybersecurity and location regressions, validate the corrected shortlist, and publish the ranking repair.
+- [x] User confirmed the published cybersecurity-ranking repair in production; the agent browser session remained unauthenticated.
+- [x] Review Career Direction preferences and the approved vacancy source’s targeted-query capabilities.
+- [x] Use saved preferred titles and eligible adjacent cybersecurity role families to guide vacancy retrieval and ranking.
+- [x] Add an explicit ranking boost and evidence tag for a title that matches an evidence-backed adjacent Career Direction path.
+- [x] Add regression coverage, validate role-guided results, and publish the Career Direction search update.
+- [x] Review Adzuna’s current API requirements, attribution terms, and South African search parameters.
+- [x] Confirm the official Adzuna terms and reflect source attribution, canonical handoff, current-refresh, and credential-confidentiality obligations in source governance.
+- [x] Store the provided Adzuna credential securely and add a governed Adzuna source adapter for Career Direction–guided searches.
+- [x] Deduplicate and rank Adzuna vacancies with existing results, add tests, validate live results, and publish the source expansion.
+- [x] Deduplicate equivalent vacancies across approved sources and label the originating provider on each shortlisted opportunity.
+- [x] Review the current project documentation, deployment configuration, and excluded local artifacts for a portable handoff.
+- [x] Write a current-environment deployment guide covering secrets, database migration, hosting choices, and paid custom-domain DNS connection.
+- [x] Create and validate a complete source archive that excludes credentials, dependencies, build output, and private user files.
+- [x] Verify the official government vacancy directory, department-page structure, table patterns, and permitted retrieval approach.
+- [x] Select Approach A: support only verified Environment, Health, and Justice page patterns; safely skip unsupported department formats.
+- [x] Add a government-department vacancy record model with department, closing date, original PDF handoff, and durable de-duplication identity.
+- [x] Implement weekly directory discovery and table-first department vacancy ingestion without PDF-body extraction.
+- [x] Record a failed government refresh when every supported department page is unavailable; never present that condition as a successful zero-result scan.
+- [x] User validated the final published weekly government refresh configuration and registered live source status after deployment.
+- [x] Create and validate an updated complete source archive including the published government-department weekly vacancy enhancement.
+- [x] Identify and document one additional official government department vacancy page with a stable, table/list-based structure.
+- [x] Add and test the fourth supported department parser, preserving department, closing date, and original official destination without PDF-body extraction.
+- [x] Add a GitHub Actions workflow that installs dependencies, runs type checks and tests, and builds the application on repository changes.
+- [x] Create and validate a reusable skill for governed, table-first government vacancy-source expansion.
+- [x] Review current salary fields across approved sources and identify a fifth official department page with a stable table/list structure.
+- [x] Add source-provided salary fields to normalized vacancy records and display salary transparently when supplied.
+- [x] Add and test a fifth verified government department adapter with original-destination preservation and no PDF-body extraction.
+- [x] Validate salary and fifth-source results, update governance documentation, and publish the enhancement.
+- [x] Add a shared Adzuna vacancy cache that serves user searches from recent stored, source-attributed records instead of calling Adzuna per search.
+- [x] Schedule and validate an idempotent twice-daily Adzuna cache refresh with transparent source-status reporting.
+- [x] Update the remaining deployment and architecture documentation for five government adapters and the twice-daily shared Adzuna cache.
+- [x] Publish the post-GCIS-parser-correction state and verify the production source governance and salary metadata presentation.
+- [x] Validate the authenticated twice-daily Adzuna callback in production and confirm repeated runs remain idempotent.
+- [x] Owner verified the published Sources page shows GCIS and shared-Adzuna-cache governance, and the published Shortlist displays source-provided salary only when present.
+- [x] Audit the current repository, deployment requirements, and excluded artifacts to explain the GitHub runtime gap accurately.
+- [x] Create a security and intellectual-property handoff covering secrets, APIs, sensitive artifacts, repository controls, and safe AI-assisted development.
+- [x] Produce and validate a fresh source-only archive with the current implementation and handoff documentation.
+- [ ] Transfer the validated source-only Job Organizer project structure to the user’s connected private GitHub repository and verify its contents.
