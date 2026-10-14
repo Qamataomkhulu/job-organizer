@@ -29,7 +29,8 @@ export const appRouter = router({
         db.getSourceConfigs(),
         db.getLatestRefresh(),
       ]);
-      return { latestResume, resumes, matches, sources, latestRefresh };
+      const publicSources = sources.map(({ accessNotes: _accessNotes, dailyTaskUid: _dailyTaskUid, ...source }) => source);
+      return { latestResume, resumes, matches, sources: publicSources, latestRefresh };
     }),
   }),
   jobs: router({
