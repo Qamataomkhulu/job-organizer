@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+const hasAdzunaCredentials = Boolean(process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY);
+
 describe("Adzuna credentials", () => {
-  it("authorises a lightweight South African job-search request", async () => {
+  it.skipIf(!hasAdzunaCredentials)("authorises a lightweight South African job-search request", async () => {
     const appId = process.env.ADZUNA_APP_ID;
     const appKey = process.env.ADZUNA_APP_KEY;
     expect(appId, "ADZUNA_APP_ID must be configured").toBeTruthy();
