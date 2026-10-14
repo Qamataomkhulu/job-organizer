@@ -15,7 +15,6 @@ import Sources from "./pages/Sources";
 import PublicPrivacy from "./pages/PublicPrivacy";
 import PublicLanding from "./pages/PublicLanding";
 import Terms from "./pages/Terms";
-import Pricing from "./pages/Pricing";
 import StaticDemo from "./pages/StaticDemo";
 
 function useHashLocation(): [string, (path: string) => void] {
@@ -39,7 +38,6 @@ function Router() {
       <Route path={"/outputs"} component={Outputs} />
       <Route path={"/privacy"} component={PublicPrivacy} />
       <Route path={"/terms"} component={Terms} />
-      <Route path={"/pricing"} component={Pricing} />
       <Route path={"/data-privacy"} component={Privacy} />
       <Route path={"/sources"} component={Sources} />
       <Route path={"/direction"} component={CareerDirection} />
@@ -58,7 +56,6 @@ function StaticRouter() {
         <Route path="/" component={PublicLanding} />
         <Route path="/demo" component={StaticDemo} />
         <Route path="/app" component={StaticDemo} />
-        <Route path="/pricing" component={Pricing} />
         <Route path="/terms" component={Terms} />
         <Route path="/privacy" component={PublicPrivacy} />
         <Route component={NotFound} />

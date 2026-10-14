@@ -55,7 +55,7 @@ Authentication still uses the existing OAuth exchange adapter. For a fully provi
 
 ## GitHub-only static demo
 
-GitHub Pages cannot execute Express, Docker, database, authentication, or scheduled jobs. GitHub Container Registry stores Docker images but does not run them. For a no-host preview, the Pages workflow builds with `VITE_STATIC_DEMO=true`; it renders the landing page and a realistic sample dashboard using local demo data, with no API calls or secrets.
+GitHub Pages cannot execute Express, Docker, database, authentication, or scheduled jobs. GitHub Container Registry stores Docker images but does not run them. For a no-host preview, the Pages workflow builds with `VITE_STATIC_DEMO=true`; it renders the landing page and a realistic sample dashboard using local demo data, with no API calls or secrets. Pricing is intentionally hidden while the product is being tested.
 
 Enable Pages at repository Settings → Pages → Source → GitHub Actions, then rerun `Deploy static demo to GitHub Pages`. The preview is `https://qamataomkhulu.github.io/job-organizer/`. The main CTA opens `#/demo`.
 
