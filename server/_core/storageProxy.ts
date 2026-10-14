@@ -24,6 +24,11 @@ export function registerStorageProxy(app: Express) {
       return;
     }
 
+    if (user.isCron) {
+      res.status(403).send("Storage access denied");
+      return;
+    }
+
     // Résumés and generated career packages are private user data. Never
     // mint a signed URL for a key outside the authenticated user's namespace.
     if (!key.startsWith(`job-organizer/${user.id}/`)) {
