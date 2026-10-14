@@ -239,7 +239,10 @@ export async function rerankStoredJobsForResume(userId: number, resumeId: number
       closingDate: job.closingDate,
     } as const;
     return { jobId: job.id, publicJob, ...scoreJobAgainstProfile(profile, publicJob) };
-  }).filter(({ publicJob }) => isEligibleDirectMatch(profile, publicJob))).map(({ publicJob: _publicJob, ...match }) => match).sort((a, b) => b.score - a.score).slice(0, 100);
+  }).filter(({ publicJob }) => {
+    const notExpired = !publicJob.closingDate || publicJob.closingDate.getTime() > Date.now();
+    return notExpired && isEligibleDirectMatch(profile, publicJob);
+  }).map(({ publicJob: _publicJob, ...match }) => match).sort((a, b) => b.score - a.score).slice(0, 100);
   await db.replaceMatchesForResume(userId, resume.id, matches);
   return matches.length;
 }
