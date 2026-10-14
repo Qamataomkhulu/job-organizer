@@ -29,7 +29,8 @@ export const appRouter = router({
         db.getSourceConfigs(),
         db.getLatestRefresh(),
       ]);
-      return { latestResume, resumes, matches, sources, latestRefresh };
+      const visibleSources = ctx.user.role === "admin" ? sources : sources.map(({ accessNotes: _accessNotes, dailyTaskUid: _dailyTaskUid, ...source }) => source);
+      return { latestResume, resumes, matches, sources: visibleSources, latestRefresh };
     }),
   }),
   jobs: router({

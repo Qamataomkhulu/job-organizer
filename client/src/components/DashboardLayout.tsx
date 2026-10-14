@@ -28,12 +28,12 @@ import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Overview", path: "/" },
+  { icon: LayoutDashboard, label: "Overview", path: "/app" },
   { icon: BriefcaseBusiness, label: "Top 25 shortlist", path: "/shortlist" },
   { icon: PackageOpen, label: "Outputs", path: "/outputs" },
   { icon: Compass, label: "Career direction", path: "/direction" },
   { icon: Database, label: "Sources", path: "/sources" },
-  { icon: ShieldCheck, label: "Privacy", path: "/privacy" },
+  { icon: ShieldCheck, label: "Privacy", path: "/data-privacy" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -50,12 +50,15 @@ export default function DashboardLayout({
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
-  const { loading, user } = useAuth();
+  const [location] = useLocation();
+  const isPublicPage = ["/", "/pricing", "/terms", "/privacy"].includes(location);
+  const { loading, user } = useAuth({ redirectOnUnauthenticated: false });
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
 
+  if (isPublicPage) return <>{children}</>;
   if (loading) {
     return <DashboardLayoutSkeleton />
   }

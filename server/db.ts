@@ -9,6 +9,7 @@ import {
   sourceConfigs,
   type User,
   users,
+  publicRateLimits,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import type { PublicJob, ScoredJob } from "./jobOrganizer/types";
@@ -56,6 +57,19 @@ export async function getUserByOpenId(openId: string) {
   return result[0];
 }
 
+export async function consumeRateLimit(fingerprintHash: string, maxRequests: number, windowMs: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  const now = new Date();
+  const existing = (await db.select().from(publicRateLimits).where(eq(publicRateLimits.fingerprintHash, fingerprintHash)).limit(1))[0];
+  if (!existing || existing.expiresAt <= now) {
+    await db.insert(publicRateLimits).values({ fingerprintHash, windowStartedAt: now, expiresAt: new Date(now.getTime() + windowMs), requestCount: 1 }).onDuplicateKeyUpdate({ set: { windowStartedAt: now, expiresAt: new Date(now.getTime() + windowMs), requestCount: 1 } });
+    return true;
+  }
+  if (existing.requestCount >= maxRequests) return false;
+  await db.update(publicRateLimits).set({ requestCount: existing.requestCount + 1 }).where(eq(publicRateLimits.fingerprintHash, fingerprintHash));
+  return true;
+}
 export async function createResume(input: typeof resumes.$inferInsert) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
@@ -72,6 +86,12 @@ export async function getLatestResumeForUser(userId: number) {
   return rows[0];
 }
 
+export async function getResumeByStorageKeyForUser(storageKey: string, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db.select({ id: resumes.id }).from(resumes).where(eq(resumes.storageKey, storageKey)).limit(1);
+  return rows[0] ? rows[0] : undefined;
+}
 export async function getResumeByIdForUser(resumeId: number, userId: number) {
   const db = await getDb();
   if (!db) return undefined;

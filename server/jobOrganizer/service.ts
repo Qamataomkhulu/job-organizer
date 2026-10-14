@@ -172,11 +172,11 @@ async function refreshJobicy(initiatedBy: "user" | "schedule", profile?: ResumeP
   }
 }
 
-async function refreshAdzuna(initiatedBy: "user" | "schedule", profile?: ResumeProfile) {
+async function refreshAdzuna(initiatedBy: "user" | "schedule", profile?: ResumeProfile, titles?: string[]) {
   await ensureAdzunaSource();
   const run = await db.createRefreshRun("adzuna", initiatedBy);
   try {
-    const jobs = await fetchAdzunaJobs(profile ? { titles: activeCareerSearchTerms(profile) } : undefined);
+    const jobs = await fetchAdzunaJobs(profile || titles ? { titles: titles ?? activeCareerSearchTerms(profile!) } : undefined);
     await db.upsertJobs(jobs);
     await db.completeRefreshRun(run.id, jobs.length);
     await db.markSourceRefreshed("adzuna", nextTwiceDailyAdzunaRefreshAt());
@@ -239,7 +239,7 @@ export async function rerankStoredJobsForResume(userId: number, resumeId: number
       closingDate: job.closingDate,
     } as const;
     return { jobId: job.id, publicJob, ...scoreJobAgainstProfile(profile, publicJob) };
-  }).filter(({ publicJob }) => isEligibleDirectMatch(profile, publicJob))).map(({ publicJob: _publicJob, ...match }) => match).sort((a, b) => b.score - a.score).slice(0, 100);
+  }).filter(({ publicJob }) => (!publicJob.closingDate || publicJob.closingDate > new Date()) && isEligibleDirectMatch(profile, publicJob))).map(({ publicJob: _publicJob, ...match }) => match).sort((a, b) => b.score - a.score).slice(0, 100);
   await db.replaceMatchesForResume(userId, resume.id, matches);
   return matches.length;
 }
@@ -275,15 +275,19 @@ export async function refreshJobicyForAllUsers() {
         closingDate: job.closingDate,
       } as const;
       return { jobId: job.id, publicJob, ...scoreJobAgainstProfile(profile, publicJob) };
-    }).filter(({ publicJob }) => isEligibleDirectMatch(profile, publicJob))).map(({ publicJob: _publicJob, ...match }) => match).sort((a, b) => b.score - a.score).slice(0, 100);
+    }).filter(({ publicJob }) => (!publicJob.closingDate || publicJob.closingDate > new Date()) && isEligibleDirectMatch(profile, publicJob))).map(({ publicJob: _publicJob, ...match }) => match).sort((a, b) => b.score - a.score).slice(0, 100);
     await db.replaceMatchesForResume(resume.userId, resume.id, matches);
   }
   return { fetched, resumesRanked: latestResumes.length };
 }
 
 export async function refreshAdzunaCacheForAllUsers() {
-  const fetched = await refreshAdzuna("schedule");
   const latestResumes = await db.listLatestResumes(100);
+  const titles = Array.from(new Set(latestResumes.flatMap(resume => {
+    const profile = JSON.parse(resume.profileJson) as ResumeProfile;
+    return activeCareerSearchTerms(profile);
+  }))).slice(0, 24);
+  const fetched = await refreshAdzuna("schedule", undefined, titles);
   for (const resume of latestResumes) await rerankStoredJobsForResume(resume.userId, resume.id);
   return { fetched, resumesRanked: latestResumes.length };
 }

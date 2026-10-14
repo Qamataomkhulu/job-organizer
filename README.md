@@ -54,3 +54,7 @@ For a portable handoff, paid custom-domain instructions, and an explanation of t
 ## Production notes
 
 Adzuna South Africa, Jobicy, and five supported government-department page patterns are the current approved adapters: Environment, Health, Justice, Employment and Labour, and GCIS. Salary is displayed only where supplied directly by an approved source. Pnet is represented as a pending source until a documented permission basis or official feed/API is available. See [`docs/architecture.md`](docs/architecture.md) for the full system design, [`docs/public-source-policy.md`](docs/public-source-policy.md) for source limits, and `self-hosting/ENVIRONMENT_TEMPLATE.md` for external deployment secrets.
+
+## GitHub and deployment
+
+This repository is GitHub-ready for source control and CI. It is a full-stack Node/Express application, so GitHub Pages alone cannot run authentication, MySQL, private object storage, or server-side AI. Deploy the included `Dockerfile` to a Node-capable host, provide the variables in `self-hosting/ENVIRONMENT_TEMPLATE.md`, and configure the protected schedules in [`docs/SCHEDULES.md`](docs/SCHEDULES.md). Do not commit secrets or user documents.

@@ -1,14 +1,28 @@
 import type { Express } from "express";
 import { ENV } from "./env";
+import { sdk } from "./sdk";
 
 export function registerStorageProxy(app: Express) {
   app.get("/manus-storage/*", async (req, res) => {
-    const key = (req.params as Record<string, string>)[0];
-    if (!key) {
+    const rawKey = (req.params as Record<string, string>)[0];
+    const key = rawKey ? decodeURIComponent(rawKey) : "";
+    if (!key || key.includes("..") || key.startsWith("/")) {
       res.status(400).send("Missing storage key");
       return;
     }
 
+    let user;
+    try {
+      user = await sdk.authenticateRequest(req);
+    } catch {
+      res.status(401).send("Authentication required");
+      return;
+    }
+    const ownedPrefix = `job-organizer/${user.id}/`;
+    if (!key.startsWith(ownedPrefix)) {
+      res.status(404).send("Storage object not found");
+      return;
+    }
     if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
       res.status(500).send("Storage proxy not configured");
       return;

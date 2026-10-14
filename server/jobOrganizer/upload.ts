@@ -2,11 +2,14 @@ import type { Express, Request, Response } from "express";
 import express from "express";
 import { sdk } from "../_core/sdk";
 import { ingestResume } from "./service";
+import * as db from "../db";
 
 export function registerResumeUploadRoute(app: Express) {
   app.post("/api/resume/upload", express.raw({ type: "application/pdf", limit: "10mb" }), async (req: Request, res: Response) => {
     try {
       const user = await sdk.authenticateRequest(req);
+      const allowed = await db.consumeRateLimit(`resume-upload:${user.id}`, 3, 60 * 60 * 1000);
+      if (!allowed) return res.status(429).json({ error: "Upload limit reached. Please try again later." });
       const filenameHeader = req.headers["x-filename"];
       const filename = typeof filenameHeader === "string" ? decodeURIComponent(filenameHeader) : "resume.pdf";
       if (!Buffer.isBuffer(req.body) || req.body.length === 0) return res.status(400).json({ error: "Attach a PDF file." });

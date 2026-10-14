@@ -1,7 +1,7 @@
 import { startLogin } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -50,19 +50,20 @@ export function useAuth(options?: UseAuthOptions) {
     }
   }, [logoutMutation, utils]);
 
+  const [storedUser, setStoredUser] = useState(meQuery.data ?? null);
+  useEffect(() => {
+    setStoredUser(meQuery.data ?? null);
+    try { localStorage.setItem("manus-runtime-user-info", JSON.stringify(meQuery.data)); } catch {}
+  }, [meQuery.data]);
   const state = useMemo(() => {
-    localStorage.setItem(
-      "manus-runtime-user-info",
-      JSON.stringify(meQuery.data)
-    );
     return {
-      user: meQuery.data ?? null,
+      user: storedUser,
       loading: meQuery.isLoading || logoutMutation.isPending,
       error: meQuery.error ?? logoutMutation.error ?? null,
       isAuthenticated: Boolean(meQuery.data),
     };
   }, [
-    meQuery.data,
+    storedUser,
     meQuery.error,
     meQuery.isLoading,
     logoutMutation.error,

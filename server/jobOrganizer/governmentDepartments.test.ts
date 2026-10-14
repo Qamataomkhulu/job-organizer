@@ -1,9 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { discoverSupportedGovernmentDepartmentPages, fetchSupportedGovernmentDepartmentJobs, fetchSupportedGovernmentDepartmentReport, parseGcisVacancyListPage, parseGovernmentTablePage, parseJusticeVacancyListPage, parseLabourVacancyListPage } from "./governmentDepartments";
 
 const directory = `<a href="https://www.dffe.gov.za/vacancies">Environment</a><a href="https://www.health.gov.za/vacancies/">Health</a><a href="https://www.justice.gov.za/vacancies/vacancies.htm">Justice</a><a href="https://www.labour.gov.za/vacancies">Labour</a><a href="https://www.gcis.gov.za/content/about-us/hr/vacancies">GCIS</a>`;
 
 describe("supported government department vacancy parsers", () => {
+  beforeEach(() => vi.setSystemTime(new Date("2026-08-20T00:00:00Z")));
+  afterEach(() => vi.useRealTimers());
   it("discovers only the five approved department pages from the official directory", () => {
     const html = `${directory}<a href="https://example.gov.za/vacancies">Unsupported</a>`;
     expect(discoverSupportedGovernmentDepartmentPages(html).map(page => page.department)).toEqual([
