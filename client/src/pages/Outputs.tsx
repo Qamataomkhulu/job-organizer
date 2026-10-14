@@ -3,11 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MarkdownDocument } from "@/components/MarkdownDocument";
 import { trpc } from "@/lib/trpc";
+import { apiUrl } from "@/lib/api";
 import { Download, FileArchive, FileText, Loader2, Sparkles } from "lucide-react";
 
 export default function Outputs() {
   const dashboard = trpc.dashboard.get.useQuery();
-  const createPackage = trpc.outputs.generate.useMutation({ onSuccess: ({ url }) => window.open(url, "_blank", "noopener,noreferrer") });
+  const createPackage = trpc.outputs.generate.useMutation({ onSuccess: ({ url }) => window.open(url.startsWith("http") ? url : apiUrl(url), "_blank", "noopener,noreferrer") });
   if (dashboard.isLoading) return <div className="jo-page grid min-h-[70vh] place-items-center"><Loader2 className="h-6 w-6 animate-spin jo-gold-text" /></div>;
   const resume = dashboard.data?.latestResume;
   if (!resume) return <EmptyOutputs />;

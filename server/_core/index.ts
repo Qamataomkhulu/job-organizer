@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -10,6 +11,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { registerResumeUploadRoute } from "../jobOrganizer/upload";
 import { registerScheduledRefreshRoute } from "../jobOrganizer/scheduled";
+import { ENV } from "./env";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -33,6 +35,10 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  const configuredAppOrigin = (() => { try { return new URL(ENV.appUrl).origin; } catch { return ENV.appUrl.replace(/\/$/, ""); } })();
+  const allowedOrigins = new Set([configuredAppOrigin, ...(process.env.CORS_ORIGINS ?? "").split(",").map(value => value.trim().replace(/\/$/, "")).filter(Boolean)]);
+  app.get("/healthz", (_req, res) => res.json({ ok: true }));
+  app.use(cors({ origin: (origin, callback) => { if (!origin || allowedOrigins.has(origin.replace(/\/$/, ""))) return callback(null, true); return callback(new Error("Origin not allowed")); }, credentials: true }));
   // Register raw-body routes before parsers. This preserves signatures for any webhook
   // integrations and keeps JSON limits intentionally small. PDF uploads have their own 10 MB parser.
   registerStorageProxy(app);

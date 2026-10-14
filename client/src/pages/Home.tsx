@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
+import { apiUrl } from "@/lib/api";
 import { ArrowUpRight, CheckCircle2, CircleCheck, FileText, FileUp, Loader2, RefreshCw, ShieldCheck, Sparkles } from "lucide-react";
 import { ChangeEvent, useMemo, useState } from "react";
 import { useLocation } from "wouter";
@@ -48,7 +49,7 @@ export default function Home() {
     setUploadState("uploading");
     setUploadError("");
     try {
-      const response = await fetch("/api/resume/upload", { method: "POST", credentials: "include", headers: { "Content-Type": "application/pdf", "X-Filename": encodeURIComponent(file.name) }, body: file });
+      const response = await fetch(apiUrl("/api/resume/upload"), { method: "POST", credentials: "include", headers: { "Content-Type": "application/pdf", "X-Filename": encodeURIComponent(file.name) }, body: file });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "We could not process that résumé.");
       await utils.dashboard.get.invalidate();

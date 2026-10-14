@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Router as WouterRouter, Switch } from "wouter";
+import { useEffect, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import DashboardLayout from "./components/DashboardLayout";
@@ -16,9 +17,20 @@ import PublicLanding from "./pages/PublicLanding";
 import Terms from "./pages/Terms";
 import Pricing from "./pages/Pricing";
 
+function useHashLocation(): [string, (path: string) => void] {
+  const read = () => window.location.hash.replace(/^#/, "") || "/";
+  const [location, setLocation] = useState(read);
+  useEffect(() => {
+    const onHashChange = () => setLocation(read());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+  return [location, path => { window.location.hash = path; setLocation(path); }];
+}
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
+    <WouterRouter hook={useHashLocation}>
     <Switch>
       <Route path={"/"} component={PublicLanding} />
       <Route path={"/app"} component={Home} />
@@ -34,6 +46,7 @@ function Router() {
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
+    </WouterRouter>
   );
 }
 

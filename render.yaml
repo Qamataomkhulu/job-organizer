@@ -1,0 +1,74 @@
+services:
+  - type: web
+    name: job-organizer-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true
+      - key: API_URL
+        sync: false
+      - key: LLM_API_URL
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_REGION
+        value: auto
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: ADZUNA_APP_ID
+        sync: false
+      - key: ADZUNA_APP_KEY
+        sync: false
+  - type: cron
+    name: job-organizer-jobicy-refresh
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "0 5 * * *"
+    dockerCommand: node scripts/run-scheduled-refresh.mjs jobicy
+    envVars:
+      - key: API_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+  - type: cron
+    name: job-organizer-adzuna-refresh
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "0 6,18 * * *"
+    dockerCommand: node scripts/run-scheduled-refresh.mjs adzuna
+    envVars:
+      - key: API_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+  - type: cron
+    name: job-organizer-government-refresh
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "0 6 * * 1"
+    dockerCommand: node scripts/run-scheduled-refresh.mjs government
+    envVars:
+      - key: API_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false
