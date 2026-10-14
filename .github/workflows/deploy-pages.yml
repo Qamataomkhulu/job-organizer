@@ -1,4 +1,4 @@
-name: Deploy React frontend to GitHub Pages
+name: Deploy static demo to GitHub Pages
 on:
   push:
     branches: [main]
@@ -23,11 +23,11 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Build static frontend
+      - name: Build static demo
         run: pnpm build:client
         env:
           VITE_BASE_PATH: /job-organizer/
-          VITE_API_URL: ${{ vars.API_URL }}
+          VITE_STATIC_DEMO: "true"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

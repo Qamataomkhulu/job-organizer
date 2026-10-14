@@ -16,6 +16,7 @@ import PublicPrivacy from "./pages/PublicPrivacy";
 import PublicLanding from "./pages/PublicLanding";
 import Terms from "./pages/Terms";
 import Pricing from "./pages/Pricing";
+import StaticDemo from "./pages/StaticDemo";
 
 function useHashLocation(): [string, (path: string) => void] {
   const read = () => window.location.hash.replace(/^#/, "") || "/";
@@ -50,12 +51,40 @@ function Router() {
   );
 }
 
+function StaticRouter() {
+  return (
+    <WouterRouter hook={useHashLocation}>
+      <Switch>
+        <Route path="/" component={PublicLanding} />
+        <Route path="/demo" component={StaticDemo} />
+        <Route path="/app" component={StaticDemo} />
+        <Route path="/pricing" component={Pricing} />
+        <Route path="/terms" component={Terms} />
+        <Route path="/privacy" component={PublicPrivacy} />
+        <Route component={NotFound} />
+      </Switch>
+    </WouterRouter>
+  );
+}
+
 // NOTE: About Theme
 // - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
+  if (import.meta.env.VITE_STATIC_DEMO === "true") {
+    return (
+      <ErrorBoundary>
+        <ThemeProvider defaultTheme="dark">
+          <TooltipProvider>
+            <Toaster />
+            <StaticRouter />
+          </TooltipProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    );
+  }
   return (
     <ErrorBoundary>
       <ThemeProvider

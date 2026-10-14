@@ -52,3 +52,11 @@ Use schedules `0 5 * * *`, `0 6,18 * * *`, and `0 6 * * 1`. Railway cron service
 - `vite` and GitHub Pages Actions for the static frontend.
 
 Authentication still uses the existing OAuth exchange adapter. For a fully provider-independent deployment, replace `server/_core/oauth.ts` and `server/_core/sdk.ts` with Auth0, Clerk, Supabase Auth, or another OIDC provider while keeping the same frontend/API split.
+
+## GitHub-only static demo
+
+GitHub Pages cannot execute Express, Docker, database, authentication, or scheduled jobs. GitHub Container Registry stores Docker images but does not run them. For a no-host preview, the Pages workflow builds with `VITE_STATIC_DEMO=true`; it renders the landing page and a realistic sample dashboard using local demo data, with no API calls or secrets.
+
+Enable Pages at repository Settings → Pages → Source → GitHub Actions, then rerun `Deploy static demo to GitHub Pages`. The preview is `https://qamataomkhulu.github.io/job-organizer/`. The main CTA opens `#/demo`.
+
+The optional `Publish API image to GitHub Container Registry` workflow publishes tagged API images to `ghcr.io`, but a separate compute provider is still required to run those images.
